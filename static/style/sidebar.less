@@ -1,0 +1,107 @@
+#sidebar {
+  width: 310px;
+  min-height: 100px;
+  float: right;
+  & > div {
+    margin-bottom: 20px;
+  }
+}
+
+#comment {
+  & > p:first-of-type {
+    background-color: @peter-river;
+    text-align: center;
+    padding: 5px;
+    color: #fff;
+  }
+
+  & > ul:first-of-type li {
+    background-color: #fff;
+    padding: 10px;
+    border-bottom: 1px solid #eee;
+    font-size: 14px;
+    color: #666;
+    line-height: 20px;
+  }
+}
+
+#hot {
+  & > p:first-of-type {
+    &:extend(#comment > p:first-of-type);
+  }
+
+  & > ul:first-of-type li {
+    &:extend(#comment > ul:first-of-type li);
+  }
+
+  & ul li {
+    & > a {
+      &:first-of-type {
+        float: left;
+      }
+
+      &:nth-of-type(2) {
+        float: left;
+        margin-left: 10px;
+      }
+    }
+
+    & p {
+      color: #aaa;
+      &:first-of-type {
+        float:left;
+        margin-left:10px;
+      }
+
+      &:nth-of-type(2) {
+        float:left;
+        margin-left:10px;
+      }
+    }
+  }
+}
+
+#link {
+  & > p:first-of-type {
+    &:extend(#comment > p:first-of-type);
+  }
+
+  & > ul:first-of-type li {
+    &:extend(#comment > ul:first-of-type li);
+  }
+}
+
+#login {
+  & > p:first-of-type {
+    &:extend(#comment > p:first-of-type);
+    cursor: pointer;
+    background-color: @emerald;
+  }
+
+  & > ul:first-of-type li {
+    &:extend(#comment > ul:first-of-type li);
+  }
+
+  & > form {
+    padding: 10px;
+    input[name="username"], input[name="password"] {
+      width: 278px;
+      margin-bottom: 10px;
+    }
+
+    input[type="submit"] {
+      float: right;
+    }
+  }
+}
+
+#function {
+  & > p:first-of-type {
+    &:extend(#comment > p:first-of-type);
+    background-color: @sun-flower;
+  }
+
+  & > ul:first-of-type li {
+    &:extend(#comment > ul:first-of-type li);
+  }
+}

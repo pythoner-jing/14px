@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block style %}
+<link rel="stylesheet/less" href="/static/style/editor.less">
+<link rel="stylesheet/less" href="/static/style/test.less">
+<link href="/static/plugin/ueditor/third-party/SyntaxHighlighter/shCoreDefault.css" rel="stylesheet" type="text/css" />
+{% end %}
+
+{% block script %}
+<script type="text/javascript" src="/static/plugin/ueditor/third-party/SyntaxHighlighter/shCore.js"></script>
+{% end %}
+
+{% block wrapper %}
+<div id="content" class="panel clear">
+	{{ content }}
+</div>
+{% end %}
+
+{% block script_bottom %}
+SyntaxHighlighter.all();
+{% end %}

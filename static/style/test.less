@@ -1,0 +1,29 @@
+@import "lazy";
+
+#content {
+	font-size: 14px;
+	background-color: #fff;
+	padding: 20px;
+	text-indent: 2em;
+	a {
+		text-decoration:none ! important;
+		color: #3498db;
+
+		&:hover {
+			color: #2980b9;
+		}
+	}
+
+	p {
+		font-size: 14px ! important;
+		color: #333;
+		line-height: 25px;
+	}
+
+	img {
+		.panel(@color: @wet-asphalt, @blur: 5px);
+		max-width: 400px;
+		max-height: 350px;
+		margin: 5px;
+	}
+}

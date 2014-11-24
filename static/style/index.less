@@ -1,0 +1,70 @@
+@import "base";
+@import "sidebar";
+
+#content {
+  float: left;
+  padding-bottom: 50px;
+}
+
+.article {
+  width: 650px;
+  padding: 10px;
+  background-color: #fff;
+  margin-bottom: 20px;
+
+  & > a {
+    &:first-of-type {
+      font-size: 24px;
+      margin-bottom: 10px;
+      float: left;
+      clear: both;
+    }
+
+    &:nth-of-type(2) {
+      float: left;
+      clear: both;
+    }
+  }
+
+  & > p {
+    float: right;
+    display: inline;
+    color: #aaa;
+    width: 330px;
+    margin: 0;
+    line-height: 27px;
+    font-size: 16px;
+    padding: 5px;
+  }
+
+  & > ul {
+    clear:both;
+    &:first-of-type {
+      padding-top: 5px;
+      padding-bottom: 20px;
+    }
+
+    &:nth-of-type(2) {
+      float: right;
+      font-size: 14px;
+      color: #aaa;
+    }
+
+    li {
+      float: left;
+      margin-right: 5px;
+    }
+  }
+}
+
+#paging {
+  float: right;
+
+  * {
+    margin-right: 5px;
+  }
+
+  a:last-of-type {
+    margin-right: 0;
+  }
+}

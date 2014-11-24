@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>14px</title>
+	{% block style %}{% end %}
+	<script src="/static/script/jquery.min.js"></script>
+	{% block script %}{% end %}
+	<script src="/static/script/form.js"></script>
+	<script>
+	less = {
+		env: "development",
+		async: false,
+		fileAsync: false,
+		poll: 1000,
+		functions: {},
+		dumpLineNumbers: "comments",
+		relativeUrls: false,
+		rootpath: ""
+	};
+	</script>
+	<script src="/static/script/less.min.js"></script>
+</head>
+<body>
+	<div id="header">14px</div>
+	<div id="navbar" class="clear">
+		<div>
+			<a href="/">首页</a>
+			<a href="">新闻</a>
+			<a href="">Sample</a>
+			<a href="">留言板</a>
+		</div>
+	</div>
+	<div id="wrapper" class="clear">
+		{% block wrapper %}{% end block %}
+	</div>
+	<div id="footer" class="clear">
+		<div id="about">
+			<p>关于我</p>
+			<p>92年宅男，爱好coding、dota，感兴趣的领域是Web和人工智能，热衷于前端研究的后台工程师。工作系统为OpenSuse13.1，常用编辑器为SublimeText2，使用Python作为主要开发语言</p>
+		</div>
+		<div id="contact">
+			<p>联系我</p>
+			<ul>
+				<li>QQ: 602478243</li>
+				<li>邮箱: 602478243@qq.com</li>
+			</ul>
+		</div>
+		<div id="declare">
+			<a href="">Copyleft ! 2014, 14px Powered By Tornado</a>
+		</div>
+	</div>
+</body>
+<script type="text/javascript">
+{% block script_bottom %}{% end %}
+</script>
+</html>

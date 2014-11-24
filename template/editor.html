@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block style %}
+<link rel="stylesheet/less" href="/static/style/editor.less">
+{% end %}
+
+{% block script %}
+<script src="/static/script/editor.js"></script>
+{% end %}
+
+{% block wrapper %}
+<a name="top"></a>
+<div id="preview">
+</div>
+<div id="content" class="panel clear">
+	<p class="text text-orange">发布新文章</p>
+	<form action="article" method="post">
+		<input type="text" name="title" placeholder="标题" class="">
+		<input type="text" name="tag" placeholder="标签" class="">
+		<input type="text" name="cover" placeholder="封面" class="">
+		<textarea id="editor" name="editor"></textarea>
+		<input type="submit" value="发布" class="btn btn-sun-flower">
+		<button type="button" id="preview_btn" class="btn btn-emerald">预览</button>
+	</form>
+</div>
+{% end %}
+
+{% block script_bottom %}
+
+{% end %}

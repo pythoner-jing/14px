@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block style %}
+<link rel="stylesheet/less" href="/static/style/index.less">
+{% end %}
+
+{% block script %}
+<script src="/static/script/sidebar.js"></script>
+{% end %}
+
+{% block wrapper %}
+<div id="content" class="clear">
+	{% for article in articles %}
+	<div class="article panel clear">
+		<a href="" class="link link-turquoise">{{ article.title }}</a>
+		<a href=""><img src="{{ article.cover }}" width="300px" height="200px"></a>
+		<p>{{ article.brief }}</p>
+		<ul>
+			{% for t in article.tags %}
+			<li><a href="" class="btn btn-peter-river btn-sm">{{ t.tagname }}</a></li>
+			{% end %}
+		</ul>
+		<hr>
+		<ul>
+			<li>{{ article.time }}</li>
+			<li>|</li>
+			<li>{{ article.click }} clicks</li>
+		</ul>
+	</div>
+	{% end %}
+	<div id="paging">
+		<a href="" class="btn btn-peter-river">首页</a>
+		<a href="" class="btn btn-peter-river">上一页</a>
+		<input placeholder="1 / 25" style="width:70px;text-align:center;" type="text" name="" id="">
+		<a href="" class="btn btn-peter-river">跳页</a>
+		<a href="" class="btn btn-peter-river">下一页</a>
+		<a href="" class="btn btn-peter-river">末页</a>
+	</div>
+</div>
+{% include "sidebar.html" %}
+{% end %}
