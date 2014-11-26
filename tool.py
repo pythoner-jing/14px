@@ -1,8 +1,10 @@
 #!/usr/bin/env python
 #coding:utf-8
 
-from HTMLParser import HTMLParser
 import markdown2
+import time
+
+from HTMLParser import HTMLParser
 
 class BriefParser(HTMLParser):
 	def __init__(self, limit):
@@ -27,3 +29,12 @@ class BriefParser(HTMLParser):
 
 	def output(self):
 		return "".join(self.rs)[:self.limit] + "..."
+
+def cut(data, size):
+	return data[:size]
+
+def gen_time():
+	return time.strftime("%Y-%m-%d %H:%M:%S")
+
+def mdparse(content):
+	return markdown2.Markdown().convert(content)

@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+
+{% block style %}
+<link rel="stylesheet/less" href="/static/style/article.less">
+{% end %}
+
+{% block script %}
+<script src="/static/script/article.js"></script>
+{% end %}
+
+{% block wrapper %}
+<a name="top"></a>
+<div id="preview">
+</div>
+<div id="content" class="panel clear">
+<center><h2>{{ article.title }}</h2></center>
+<center>{{ article.time }}</center>
+<hr>
+{{ mdparse(article.content) }}
+<hr>
+<ul style="list-style:none;margin-left:0;">
+{% for t in article.tags %}
+<li style="float:left;margin-right:5px;"><a href="/tag/{{ t.tagname }}/" class="btn btn-peter-river btn-sm">{{ t.tagname }}</a></li>
+{% end %}
+</ul>
+</div>
+<div id="comment">
+	{% for comment in comments %}
+	<div class="panel">
+		<div>
+			<a guestid="{{ comment.guest.id }}" name="comment-{{ comment.guest.id }}" class="text text-orange guest">{{ comment.guest.guestname }}</a>
+			{% if comment.ref %}
+			<a href="#comment-{{ comment.ref.id }}" class="link link-peter-river">@ {{ comment.ref.guestname }}</a>
+			{% end %}
+			{% if current_user %}
+			<span class="text text-clouds">{{ comment.guest.email }}</span>
+			{% if comment.guest.homepage %}<span class="text text-clouds">{{ comment.guest.homepage }}</span>{% end %}
+			{% end %}
+			<span>{{ comment.time }}</span>
+			<a href="" class="link link-peter-river reply">回复</a>
+			<a href="/article/{{ article.id }}/comment/{{ comment.id }}/" class="link link-alizarin delete">删除</a>
+		</div>
+		<div>{{ mdparse(comment.content) }}</div>
+	</div>
+	{% end %}
+</div>
+<a name="reply"></a>
+<div id="reply" class="panel clear">
+	<form action="/article/{{ article.id}}/comment/" method="post">
+		<input type="text" name="guestname" placeholder="昵称(必填)">
+		<input type="text" name="email" placeholder="邮箱(必填)">
+		<input type="text" name="homepage" placeholder="主页(选填)">
+		<input type="hidden" name="ref">
+		<textarea id="replybox" name="content" cols="30" rows="10" placeholder="评论支持Markdown语法"></textarea>
+		<span id="tip"></span><span id="cancel">撤销</span>
+		<input type="submit" value="评论" class="btn btn-turquoise">
+	</form>
+</div>
+{% end %}
+
+{% block script_bottom %}
+
+{% end %}

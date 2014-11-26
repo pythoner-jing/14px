@@ -1,0 +1,72 @@
+@import "base";
+
+#content {
+	.content;
+	.panel;
+	& > center:nth-of-type(2) {
+		color: #aaa;
+	}		    
+}
+
+#comment {
+	& > div {
+		.panel(@green-sea);
+		background: #fff;
+		padding: 10px;
+		margin-bottom: 20px;
+		& > div:first-of-type {
+			font-size: 14px;
+			* {
+				margin-right: 10px;
+			}	
+
+			span {
+				font-size: 15px;
+				color: #aaa;
+			}
+		}
+
+		& > div:nth-of-type(2) {
+			.content;
+			margin-bottom: 0;
+			padding: 10px;
+			& pre {
+				width: 920px;
+			}
+		}
+	}
+}
+
+#reply {
+	background: #fff;
+	padding: 10px;	
+	margin-bottom: 20px;
+	& > form {
+		& > input[type="text"] {
+			float: left;
+			width: 310px;
+			margin-right: 7px;
+			&:nth-of-type(3) {
+				margin-right: 0;
+			}
+		}
+
+		& > textarea {
+			margin-top: 10px;
+			margin-bottom: 10px;
+			width: 968px;
+			& ~ #tip {
+				font-size: 14px;
+				color: #aaa; 
+			}
+			& ~ input {
+				float: right;
+			}
+		}
+		#cancel {
+			font-size: 14px;
+			color: #aaa; 
+			cursor: pointer;
+		}
+	}
+}

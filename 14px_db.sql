@@ -21,7 +21,27 @@ id INT NOT NULL AUTO_INCREMENT,
 article_id INT NOT NULL,
 tag_id INT NOT NULL,
 PRIMARY KEY(id),
-FOREIGN KEY(article_id) REFERENCES Article(id) ON DELETE CASCADE,
-FOREIGN KEY(Tag_id) REFERENCES Tag(id)
+CONSTRAINT fk_article_id FOREIGN KEY(article_id) REFERENCES Article(id) ON DELETE CASCADE,
+CONSTRAINT fk_tag_id FOREIGN KEY(tag_id) REFERENCES Tag(id)
+);
+
+CREATE TABLE IF NOT EXISTS `Comment`(
+id INT NOT NULL AUTO_INCREMENT,
+article_id INT NOT NULL,
+guest_id INT NOT NULL,
+content TEXT(500) NOT NULL,
+time DATETIME NOT NULL,
+ref INT,
+CONSTRAINT fk_Comment_article_id FOREIGN KEY(article_id) REFERENCES Article(id),
+CONSTRAINT fk_Comment_guest_id FOREIGN KEY(guest_id) REFERENCES Guest(id),
+PRIMARY KEY(id)
+);
+
+CREATE TABLE IF NOT EXISTS `Guest`(
+id INT NOT NULL AUTO_INCREMENT,
+guestname VARCHAR(50) NOT NULL,
+email TEXT NOT NULL,
+homepage TEXT,
+PRIMARY KEY(id)
 );
 
