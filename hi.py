@@ -2,15 +2,21 @@
 # coding:utf-8
 
 
-def output(x):
-    """
+class A:
+    def __init__(self):
+        pass
 
-    :rtype : str
-    """
-    y = 0
-    x = 1
-    x = 2
-    x = 3
-    print x
+    def output(self):
+        print "I am class A!"
 
-output("你好")
+
+class B(A):
+    def __init__(self):
+        A.__init__(self)
+
+    def output(self):
+        print repr(self)
+        print "I am class B!"
+
+b = B()
+b.output()

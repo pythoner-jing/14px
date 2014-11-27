@@ -6,16 +6,17 @@ $(document).ready(function(){
 	var $cancel = $("#cancel");
 	var $ref = $("#reply :hidden");
 	var $delete = $(".delete");
-	var $delete_article = $("#delete");
 	var $time = $("#time");
+	var $opt = $("#opt");
 	$reply.hide();
 	$tip.hide();
 	$cancel.hide();
 	$delete.hide();
-	$delete_article.hide();
+	$opt.hide();
 
 	$comment.hover(function(){
 		$(this).find(".reply").toggle();
+	}).click(function(){
 		$(this).find(".delete").toggle();
 	});
 
@@ -36,6 +37,6 @@ $(document).ready(function(){
 	});
 
 	$time.click(function(){
-		$delete_article.toggle();
+		$opt.toggle();
 	});
 });

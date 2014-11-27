@@ -6,11 +6,16 @@
         {% end %}
         {% if current_user %}
         <span class="text text-clouds">{{ comment.guest.email }}</span>
-        {% if comment.guest.homepage %}<span class="text text-clouds">{{ comment.guest.homepage }}</span>{% end %}
+        <span class="text text-clouds">{{ comment.guest.homepage }}</span>
         {% end %}
         <span>{{ comment.time }}</span>
-        <a href="" class="link link-peter-river reply">回复</a>
-        <a href="/article/{{ article.id }}/comment/{{ comment.id }}/" class="link link-alizarin delete">删除</a>
+        <a href="" class="link link-peter-river reply" style="">回复</a>
+        {% if current_user %}
+        <form style="display:inline;" class="delete" action="/article/{{ article.id }}/comment/{{ comment.id }}/" method="post">
+            <input type="submit" class="link link-alizarin" value="删除"/>
+            <input name="_method" value="delete" type="hidden"/>
+        </form>
+        {% end %}
     </div>
     <div>{{ comment.content }}</div>
 </div>

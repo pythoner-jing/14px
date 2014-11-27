@@ -33,8 +33,11 @@ class TopModule(tornado.web.UIModule):
 
 class CommentModule(tornado.web.UIModule):
     def render(self, article, comment):
-        sql = "SELECT * FROM Guest WHERE id=%s"
-        comment["guest"] = DB.get(sql, comment["guest_id"])
-        if comment["ref"]:
-            comment["ref"] = DB.get(sql, comment["ref"])
+        try:
+            sql = "SELECT * FROM Guest WHERE id=%s"
+            comment["guest"] = DB.get(sql, comment["guest_id"])
+            if comment["ref"]:
+                comment["ref"] = DB.get(sql, comment["ref"])
+        except Exception, e:
+            print e
         return self.render_string("modules/comment.html", article=article, comment=comment)

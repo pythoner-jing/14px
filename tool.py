@@ -30,7 +30,8 @@ class BriefParser(HTMLParser):
 			self.rs.append(data.strip())
 
 	def output(self):
-		return "".join(self.rs)[:self.limit] + "..."
+		tmp = "".join(self.rs)[:self.limit]
+		return tmp if len(tmp) <= self.limit else tmp + "..."
 
 
 def cut(data, size):

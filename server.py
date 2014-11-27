@@ -24,7 +24,7 @@ import tornado.ioloop
 
 define('username', default='14px')
 define('password', default='britten')
-define('plimit', default=10)
+define('plimit', default=2)
 define('toplimit', default=10)
 define('climit', default=10)
 
@@ -61,8 +61,8 @@ class IndexHandler(BaseHandler):
 
 class AuthHandler(BaseHandler):
 	def post(self):
-		username = self.get_argument("username", "").strip()
-		password = self.get_argument("password", "").strip()
+		username = self.get_argument("username", "")
+		password = self.get_argument("password", "")
 		if username == options.username and password == options.password:
 			self.set_secure_cookie("user", username)
 		self.redirect("/")
@@ -73,8 +73,9 @@ class AuthHandler(BaseHandler):
 
 
 class ArticleHandler(BaseHandler):
+	@tool.restful
 	@tornado.web.authenticated
-	def post(self):
+	def post(self, *args):
 		title = self.get_argument("title")
 		tag = self.get_argument("tag")
 		content = self.get_argument("editor")
@@ -96,7 +97,7 @@ class ArticleHandler(BaseHandler):
 			article_tags = [(aid, x) for x in range(tid - len(_tags) + 1, tid + 1)]
 			DB.insertmany(sql3, article_tags)
 		except Exception, e:
-			print e
+			print self, e
 
 		self.redirect("/")
 
@@ -112,14 +113,21 @@ class ArticleHandler(BaseHandler):
 			article = DB.get(sql, id)
 			article["tags"] = DB.query(sql2, article["id"])
 			comments = DB.query(sql4, id)
+			if not self.get_secure_cookie("guestname"):
+				self.set_secure_cookie("guestname", "")
+				self.set_secure_cookie("email", "")
+				self.set_secure_cookie("homepage", "")
 			data = dict(
 				article=article,
 				comments=comments,
 				mdparse=tool.mdparse,
+				guestname=self.get_secure_cookie("guestname"),
+				homepage=self.get_secure_cookie("homepage"),
+				email=self.get_secure_cookie("email"),
 			)
 			self.render("article.html", **data)
 		except Exception, e:
-			print e
+			print self, e
 			self.redirect("/")
 
 	@tornado.web.authenticated
@@ -130,9 +138,9 @@ class ArticleHandler(BaseHandler):
 	def delete(self, id):
 		sql = "DELETE FROM Article WHERE id=%s"
 		try:
-			DB.query(sql, id)
+			DB.update(sql, id)
 		except Exception, e:
-			print e
+			print self, e
 		finally:
 			self.redirect("/")
 
@@ -171,31 +179,36 @@ class TagHandler(BaseHandler):
 			)
 			self.render("index.html", **data)
 		except Exception, e:
-			print e
+			print self, e
 			self.redirect("/")
 
 
 class CommentHandler(BaseHandler):
-	def post(self, aid):
+	@tool.restful
+	def post(self, *args):
+		aid = args[0]
 		sql = "INSERT INTO Guest(guestname, email, homepage) VALUES(%s, %s, %s)"
 		sql2 = "INSERT INTO Comment(article_id, guest_id, content, time, ref) VALUES(%s, %s, %s, %s, %s)"
 		try:
 			guestname = self.get_argument("guestname")
-			if guestname.strip() == "14px" and not self.get_current_user():
+			if guestname == "14px" and not self.get_current_user():
 				raise Exception("not 14px")
 			email = self.get_argument("email")
-			homepage = self.get_argument("homepage", None)
+			homepage = self.get_argument("homepage", "")
 			ref = self.get_argument("ref", None)
 			content = self.get_argument("content")
 			guestid = DB.insert(sql, guestname, email, homepage)
 			DB.insert(sql2, aid, guestid, content, tool.gen_time(), ref)
+			self.set_secure_cookie("guestname", guestname)
+			self.set_secure_cookie("email", email)
+			self.set_secure_cookie("homepage", homepage)
 			self.redirect("/article/%s#comment-%s" % (aid, guestid))
 		except Exception, e:
-			print e
+			print self, e
 			self.redirect("/article/%s" % aid)
 
 	@tornado.web.authenticated
-	def get(self, aid, cid):
+	def delete(self, aid, cid):
 		sql = "DELETE FROM Comment WHERE id=%s"
 		try:
 			DB.update(sql, cid)
@@ -204,24 +217,6 @@ class CommentHandler(BaseHandler):
 		finally:
 			self.redirect("/article/%s#top" % aid)
 
-
-class RestHandler(BaseHandler):
-	def get(self):
-		self.render("restful.html")
-
-	@tool.restful
-	def post(self):
-		print "call post method"
-		self.redirect("/rest/")
-
-	def put(self):
-		print "call put method"
-		self.redirect("/rest/")
-
-	def delete(self):
-		print "call delete method"
-		self.redirect("/rest/")
-	
 
 class Application(tornado.web.Application):
 	def __init__(self):
@@ -234,7 +229,6 @@ class Application(tornado.web.Application):
 			(r"^/tag/(.+)/(\d*)$", TagHandler),
 			(r"^/article/(\d+)/comment/$", CommentHandler),
 			(r"^/article/(\d+)/comment/(\d+)/$", CommentHandler),
-			(r"^/rest/$", RestHandler),
 		]
 			
 		settings = dict(
@@ -253,7 +247,6 @@ class Application(tornado.web.Application):
 		
 		tornado.web.Application.__init__(self, urls, **settings)
 		
-
 
 if __name__ == "__main__":
 	Application().listen(8888)

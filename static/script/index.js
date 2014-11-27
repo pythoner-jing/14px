@@ -1,7 +1,7 @@
 $(document).ready(function(){
 	var $page = $("#page");
 	var $jump = $("#jump");
-	console.log("test");
+
 	$jump.click(function(){
 		var p = $page.val() == "" ? "1" : $page.val();
 		window.location.href = p;
