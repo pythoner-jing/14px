@@ -218,6 +218,11 @@ class CommentHandler(BaseHandler):
 			self.redirect("/article/%s#top" % aid)
 
 
+class NotFoundHandler(BaseHandler):
+	def get(self):
+		self.render("404.html")
+
+
 class Application(tornado.web.Application):
 	def __init__(self):
 		urls = [
@@ -229,6 +234,7 @@ class Application(tornado.web.Application):
 			(r"^/tag/(.+)/(\d*)$", TagHandler),
 			(r"^/article/(\d+)/comment/$", CommentHandler),
 			(r"^/article/(\d+)/comment/(\d+)/$", CommentHandler),
+			(r".*", NotFoundHandler),
 		]
 			
 		settings = dict(
