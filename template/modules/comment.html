@@ -1,0 +1,16 @@
+<div class="panel">
+    <div>
+        <a guestid="{{ comment.guest.id }}" name="comment-{{ comment.guest.id }}" class="text text-orange guest">{{ comment.guest.guestname }}</a>
+        {% if comment.ref %}
+        <a href="#comment-{{ comment.ref.id }}" class="link link-peter-river">@ {{ comment.ref.guestname }}</a>
+        {% end %}
+        {% if current_user %}
+        <span class="text text-clouds">{{ comment.guest.email }}</span>
+        {% if comment.guest.homepage %}<span class="text text-clouds">{{ comment.guest.homepage }}</span>{% end %}
+        {% end %}
+        <span>{{ comment.time }}</span>
+        <a href="" class="link link-peter-river reply">回复</a>
+        <a href="/article/{{ article.id }}/comment/{{ comment.id }}/" class="link link-alizarin delete">删除</a>
+    </div>
+    <div>{{ comment.content }}</div>
+</div>

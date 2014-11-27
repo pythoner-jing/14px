@@ -6,10 +6,13 @@ $(document).ready(function(){
 	var $cancel = $("#cancel");
 	var $ref = $("#reply :hidden");
 	var $delete = $(".delete");
+	var $delete_article = $("#delete");
+	var $time = $("#time");
 	$reply.hide();
 	$tip.hide();
 	$cancel.hide();
 	$delete.hide();
+	$delete_article.hide();
 
 	$comment.hover(function(){
 		$(this).find(".reply").toggle();
@@ -30,5 +33,9 @@ $(document).ready(function(){
 		$ref.val("");
 		$tip.hide();
 		$cancel.hide();
+	});
+
+	$time.click(function(){
+		$delete_article.toggle();
 	});
 });

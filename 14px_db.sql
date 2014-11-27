@@ -29,7 +29,7 @@ CREATE TABLE IF NOT EXISTS `Comment`(
 id INT NOT NULL AUTO_INCREMENT,
 article_id INT NOT NULL,
 guest_id INT NOT NULL,
-content TEXT(500) NOT NULL,
+content VARCHAR(1000) NOT NULL,
 time DATETIME NOT NULL,
 ref INT,
 CONSTRAINT fk_Comment_article_id FOREIGN KEY(article_id) REFERENCES Article(id),

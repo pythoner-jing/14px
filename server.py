@@ -4,10 +4,11 @@
 import tornado.web
 import os
 import markdown2
-import torndb
 import time
 import tool
+import module
 
+from db import *
 from tornado.options import define, options
 from tool import BriefParser, cut
 
@@ -16,27 +17,16 @@ from tool import BriefParser, cut
 #
 # 	DEBUG = False
 # else:
-MYSQL_HOST = "localhost"
-MYSQL_PORT = 3306
-MYSQL_USER = "root"
-MYSQL_PASS = ""
-MYSQL_DB = "14px"
+
+
 DEBUG = True
 import tornado.ioloop
-
-DB = torndb.Connection(
-    '%s:%s' % (MYSQL_HOST, str(MYSQL_PORT)),
-    MYSQL_DB,
-    MYSQL_USER,
-    MYSQL_PASS,
-    max_idle_time=5,
-    connect_timeout=5,
-)
 
 define('username', default='14px')
 define('password', default='britten')
 define('plimit', default=10)
 define('toplimit', default=10)
+define('climit', default=10)
 
 
 class BaseHandler(tornado.web.RequestHandler):
@@ -46,39 +36,25 @@ class BaseHandler(tornado.web.RequestHandler):
 
 class IndexHandler(BaseHandler):
 	def get(self, p):
-		sql = 'SELECT * FROM Article ORDER BY id DESC LIMIT %s, %s'
-		sql2 = 'SELECT tagname FROM Article_Tag AS a,\
-		Tag AS t WHERE a.article_id=%s AND a.tag_id=t.id'
-		sql3 = "SELECT COUNT(*) AS count FROM Article"
-		sql4 = "SELECT * FROM Article ORDER BY click DESC LIMIT 0, %s"
+		sql = "SELECT * FROM Article ORDER BY id DESC LIMIT %s, %s"
+		sql2 = "SELECT COUNT(*) AS count FROM Article"
+		sql3 = "SELECT * FROM Article ORDER BY click DESC LIMIT 0, %s"
+		sql4 = "SELECT * FROM Comment ORDER BY id DESC LIMIT 0, %s"
 
-		count = DB.query(sql3)[0]["count"]
-		last = count / options.plimit if count % options.plimit == 0 else count / options.plimit + 1
-		p = p if p else 1
+		count = DB.get(sql2)["count"]
 
-		if 1 <= p <= last:
-			offset = p - 1
-		else:
-			offset = 0
-
-		paging = dict(
-			pre=None if p - 1 <= 0 else p - 1,
-			next=None if p + 1 > last else p + 1,
-			first=1,
-			last=last,
-			current=p,
-		)
+		paging, offset = tool.paging(p, count, options.plimit)
 
 		articles = DB.query(sql, offset * options.plimit, options.plimit)
-		for a in articles:
-			a["tags"] = DB.query(sql2, a["id"])
+		comments = DB.query(sql4, options.climit)
+		tops = DB.query(sql3, options.toplimit)
 
-		tops = DB.query(sql4, options.toplimit)
 		data = dict(
 			articles=articles,
 			paging=paging,
 			cut=cut,
 			tops=tops,
+			comments=comments,
 		)
 		self.render("index.html", **data)
 
@@ -130,20 +106,34 @@ class ArticleHandler(BaseHandler):
 		Tag AS t WHERE a.article_id=%s AND a.tag_id=t.id"
 		sql3 = "UPDATE Article SET click=click+1 WHERE id=%s"
 		sql4 = "SELECT * FROM Comment WHERE article_id=%s"
-		sql5 = "SELECT * FROM Guest WHERE id=%s"
 
 		try:
 			DB.update(sql3, id)
-			article = DB.query(sql, id)[0]
+			article = DB.get(sql, id)
 			article["tags"] = DB.query(sql2, article["id"])
 			comments = DB.query(sql4, id)
-			for comment in comments:
-				comment["guest"] = DB.query(sql5, comment["guest_id"])[0]
-				if comment["ref"]:
-					comment["ref"] = DB.query(sql5, comment["ref"])[0]
-			self.render("article.html", article=article, comments=comments, mdparse=tool.mdparse)
+			data = dict(
+				article=article,
+				comments=comments,
+				mdparse=tool.mdparse,
+			)
+			self.render("article.html", **data)
 		except Exception, e:
 			print e
+			self.redirect("/")
+
+	@tornado.web.authenticated
+	def put(self):
+		pass
+
+	@tornado.web.authenticated
+	def delete(self, id):
+		sql = "DELETE FROM Article WHERE id=%s"
+		try:
+			DB.query(sql, id)
+		except Exception, e:
+			print e
+		finally:
 			self.redirect("/")
 
 
@@ -162,30 +152,26 @@ class EditorHandler(BaseHandler):
 class TagHandler(BaseHandler):
 	def get(self, t, p):
 		sql = "SELECT a.* FROM Article AS a, Tag AS t, Article_Tag AS at WHERE t.tagname=%s AND t.id=at.tag_id AND a.id=at.article_id LIMIT %s, %s"
-		sql2 = "SELECT tagname FROM Article_Tag AS a,\
-		Tag AS t WHERE a.article_id=%s AND a.tag_id=t.id"
-		sql3 = "SELECT COUNT(*) AS count FROM Article AS a, Tag AS t, Article_Tag AS at WHERE t.tagname=%s AND t.id=at.tag_id AND a.id=at.article_id"
+		sql2 = "SELECT COUNT(*) AS count FROM Article AS a, Tag AS t, Article_Tag AS at WHERE t.tagname=%s AND t.id=at.tag_id AND a.id=at.article_id"
+		sql3 = "SELECT * FROM Article ORDER BY click DESC LIMIT 0, %s"
+		sql4 = "SELECT * FROM Comment ORDER BY id DESC LIMIT 0, %s"
 
 		try:
-			count = DB.query(sql3, t)[0]["count"]
-			last = count / options.plimit if count % options.plimit == 0 else count / options.plimit + 1
-			p = int(p) if (p and 1 <= int(p) <= last) else 1
-			if 1 <= p <= last:
-				offset = p - 1
-			else:
-				offset = 0
-			paging = dict(
-				pre=None if p - 1 <= 0 else p - 1,
-				next=None if p + 1 > last else p + 1,
-				first=1,
-				last=last,
-				current=p,
-			)
+			count = DB.get(sql2, t)["count"]
+			paging, offset = tool.paging(p, count, options.plimit)
 			articles = DB.query(sql, t, offset * options.plimit, options.plimit)
-			for article in articles:
-				article["tags"] = DB.query(sql2, article["id"])
-			self.render("index.html", articles=articles, paging=paging)
+			comments = DB.query(sql4, options.climit)
+			tops = DB.query(sql3, options.toplimit)
+			data = dict(
+				articles=articles,
+				paging=paging,
+				cut=tool.cut,
+				tops=tops,
+				comments=comments,
+			)
+			self.render("index.html", **data)
 		except Exception, e:
+			print e
 			self.redirect("/")
 
 
@@ -205,6 +191,7 @@ class CommentHandler(BaseHandler):
 			DB.insert(sql2, aid, guestid, content, tool.gen_time(), ref)
 			self.redirect("/article/%s#comment-%s" % (aid, guestid))
 		except Exception, e:
+			print e
 			self.redirect("/article/%s" % aid)
 
 	@tornado.web.authenticated
@@ -215,29 +202,59 @@ class CommentHandler(BaseHandler):
 		except Exception, e:
 			pass
 		finally:
-			self.redirect("/article/%s" % aid)
+			self.redirect("/article/%s#top" % aid)
 
 
-URLS = [
-	(r"^/(\d*)$", IndexHandler),
-	(r"^/auth/$", AuthHandler),
-	(r"^/editor/$", EditorHandler),
-	(r"^/article/(\d+)$", ArticleHandler),
-	(r"^/tag/(.+)/(\d*)$", TagHandler),
-	(r"^/article/(\d+)/comment/$", CommentHandler),
-	(r"^/article/(\d+)/comment/(\d+)/$", CommentHandler),
-]
+class RestHandler(BaseHandler):
+	def get(self):
+		self.render("restful.html")
 
-SETTINGS = dict(
-    template_path=os.path.join(os.path.dirname(__file__), "template"),
-    static_path=os.path.join(os.path.dirname(__file__), "static"),
-    debug=True,
-    cookie_secret="61oETzKXQAGaYdkL5gEmGeJJFuYh7EQnp2XdTP1o/Vo=",
-    login_url="/",
-)
+	@tool.restful
+	def post(self):
+		print "call post method"
+		self.redirect("/rest/")
 
-application = tornado.web.Application(URLS, **SETTINGS)
+	def put(self):
+		print "call put method"
+		self.redirect("/rest/")
+
+	def delete(self):
+		print "call delete method"
+		self.redirect("/rest/")
+	
+
+class Application(tornado.web.Application):
+	def __init__(self):
+		urls = [
+			(r"^/(\d*)$", IndexHandler),
+			(r"^/auth/$", AuthHandler),
+			(r"^/editor/$", EditorHandler),
+			(r"^/article/$", ArticleHandler),
+			(r"^/article/(\d+)$", ArticleHandler),
+			(r"^/tag/(.+)/(\d*)$", TagHandler),
+			(r"^/article/(\d+)/comment/$", CommentHandler),
+			(r"^/article/(\d+)/comment/(\d+)/$", CommentHandler),
+			(r"^/rest/$", RestHandler),
+		]
+			
+		settings = dict(
+			template_path=os.path.join(os.path.dirname(__file__), "template"),
+			static_path=os.path.join(os.path.dirname(__file__), "static"),
+			debug=True,
+			cookie_secret="61oETzKXQAGaYdkL5gEmGeJJFuYh7EQnp2XdTP1o/Vo=",
+			login_url="/",
+			ui_modules={
+				"RecentComment": module.RecentCommentModule,
+				"Brief": module.BriefModule,
+				"Top": module.TopModule,
+				"Comment": module.CommentModule,
+			},
+		)
+		
+		tornado.web.Application.__init__(self, urls, **settings)
+		
+
 
 if __name__ == "__main__":
-	application.listen(8888)
+	Application().listen(8888)
 	tornado.ioloop.IOLoop.instance().start()

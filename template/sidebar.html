@@ -2,23 +2,16 @@
 	<div id="comment" class="panel">
 		<p>最新评论</p>
 		<ul>
-			<li>孙策伯符&nbsp;发表于&nbsp;<a href="" class="link link-sun-flower">14px博客系统</a><p style="color:#aaa;">做的不错啊做的不错啊做的不错啊做的不错啊做的不错啊做的不错啊</p></li>
-			<li>孙策伯符&nbsp;发表于&nbsp;<a href="" class="link link-sun-flower">14px博客系统</a><p style="color:#aaa;">做的不错啊做的不错啊做的不错啊做的不错啊做的不错啊做的不错啊</p></li>
-			<li>孙策伯符&nbsp;发表于&nbsp;<a href="" class="link link-sun-flower">14px博客系统</a><p style="color:#aaa;">做的不错啊做的不错啊做的不错啊做的不错啊做的不错啊做的不错啊</p></li>
+			{% for comment in comments %}
+				{{ modules.RecentComment(comment) }}
+			{% end %}
 		</ul>
 	</div>
 	<div id="hot" class="panel">
 		<p>热门文章</p>
 		<ul>
 			{% for article in tops %}
-			<li class="clear">
-				<a href="/article/{{ article.id }}"><img src="{{ article.cover }}" alt="" width="100px" height="60px"></a>
-				<a href="/article/{{ article.id }}" class="link link-sun-flower" title="{{ article.title }}">{{ article.title }}</a>
-				<br>
-				<p>{{ article.time }}</p>
-				<br>
-				<p>{{ article.click }} clicks</p>
-			</li>
+				{{ modules.Top(article) }}
 			{% end %}
 		</ul>
 	</div>
@@ -33,7 +26,7 @@
 	{% if not current_user %}
 	<div id="login" class="panel">
 		<p>登录</p>
-		<form action="auth/" class="clear" method="post">
+		<form action="/auth/" class="clear" method="post">
 			<input type="text" class="select" placeholder="用户名" name="username">
 			<input type="password" class="select" placeholder="密码" name="password">
 			<input type="submit" value="登录" class="btn btn-emerald">
@@ -43,9 +36,9 @@
 	<div id="function" class="panel">
 		<p>功能</p>
 		<ul>
-			<li><a href="editor/" class="link link-sun-flower">发布新文章</a></li>
+			<li><a href="/editor/" class="link link-sun-flower">发布新文章</a></li>
 			<li><a href="" class="link link-sun-flower">编辑链接</a></li>
-			<li><a href="auth/" class="link link-sun-flower">注销</a></li>
+			<li><a href="/auth/" class="link link-sun-flower">注销</a></li>
 		</ul>
 	</div>
 	{% end %}

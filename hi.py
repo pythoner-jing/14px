@@ -2,9 +2,15 @@
 # coding:utf-8
 
 
-class A:
-    def __init__(self):
-        self.key = "你啊好"
+def output(x):
+    """
 
-    def output(self):
-        print self.key
+    :rtype : str
+    """
+    y = 0
+    x = 1
+    x = 2
+    x = 3
+    print x
+
+output("你好")
