@@ -21,9 +21,8 @@
                 <input type="submit" class="btn btn-alizarin btn-sm" style="margin-top:10px;" value="删除"/>
                 <input name="_method" value="delete" type="hidden"/>
             </form>
-            <form action="/article/{{ article.id }}" method="post">
+            <form action="/editor/{{ article.id }}" method="get">
                 <input type="submit" class="btn btn-emerald btn-sm" style="margin-top:10px;" value="编辑"/>
-                <input name="_method" value="put" type="hidden"/>
             </form>
         </div>
         {% end %}

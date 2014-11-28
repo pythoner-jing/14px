@@ -18,9 +18,9 @@
 	<div id="link" class="panel">
 		<p>链接</p>
 		<ul>
-			<li><a href="" class="link link-amethyst">Fancy2D</a></li>
-			<li><a href="" class="link link-amethyst">开源中国</a></li>
-			<li><a href="" class="link link-amethyst">Github</a></li>
+			{% for link in links %}
+			<li><a href="{{ link.address }}" class="link link-peter-river" target="_blank">{{ link.title }}</a></li>
+			{% end %}
 		</ul>
 	</div>
 	{% if not current_user %}
@@ -37,7 +37,7 @@
 		<p>功能</p>
 		<ul>
 			<li><a href="/editor/" class="link link-sun-flower">发布新文章</a></li>
-			<li><a href="" class="link link-sun-flower">编辑链接</a></li>
+			<li><a href="/linkeditor/" class="link link-sun-flower">编辑链接</a></li>
 			<li><a href="/auth/" class="link link-sun-flower">注销</a></li>
 		</ul>
 	</div>

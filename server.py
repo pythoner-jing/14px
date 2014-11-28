@@ -24,7 +24,7 @@ import tornado.ioloop
 
 define('username', default='14px')
 define('password', default='britten')
-define('plimit', default=2)
+define('plimit', default=10)
 define('toplimit', default=10)
 define('climit', default=10)
 
@@ -33,6 +33,12 @@ class BaseHandler(tornado.web.RequestHandler):
 	def get_current_user(self):
 		return self.get_secure_cookie('user')
 
+	def get_error_html(self, status_code, **kwargs):
+		if status_code == 404:
+			return self.render_string("404.html")
+		else:
+			tornado.web.RequestHandler.get_error_html(self, status_code, **kwargs)
+
 
 class IndexHandler(BaseHandler):
 	def get(self, p):
@@ -40,6 +46,7 @@ class IndexHandler(BaseHandler):
 		sql2 = "SELECT COUNT(*) AS count FROM Article"
 		sql3 = "SELECT * FROM Article ORDER BY click DESC LIMIT 0, %s"
 		sql4 = "SELECT * FROM Comment ORDER BY id DESC LIMIT 0, %s"
+		sql5 = "SELECT * FROM Link"
 
 		count = DB.get(sql2)["count"]
 
@@ -49,12 +56,15 @@ class IndexHandler(BaseHandler):
 		comments = DB.query(sql4, options.climit)
 		tops = DB.query(sql3, options.toplimit)
 
+		links = DB.query(sql5)
+
 		data = dict(
 			articles=articles,
 			paging=paging,
 			cut=cut,
 			tops=tops,
 			comments=comments,
+			links=links,
 		)
 		self.render("index.html", **data)
 
@@ -131,8 +141,34 @@ class ArticleHandler(BaseHandler):
 			self.redirect("/")
 
 	@tornado.web.authenticated
-	def put(self):
-		pass
+	def put(self, *args):
+		id = args[0]
+		sql = "INSERT INTO Article(title, content, brief, cover, time) VALUES(%s, %s, %s, %s, %s)"
+		sql2 = "INSERT INTO Tag(tagname, createtime) VALUES(%s, %s)"
+		sql3 = "INSERT INTO Article_Tag(article_id, tag_id) VALUES(%s, %s)"
+		sql4 = "UPDATE Article SET title=%s, content=%s, brief=%s, cover=%s, time=%s WHERE id=%s"
+		sql5 = "DELETE FROM Tag WHERE id IN (SELECT at.tag_id FROM Article AS a, Article_Tag AS at WHERE a.id=%s AND a.id=at.article_id)"
+		try:
+			DB.update(sql5, id)
+
+			title = self.get_argument("title")
+			tag = self.get_argument("tag")
+			content = self.get_argument("editor")
+			cover = self.get_argument("cover")
+			_content = markdown2.Markdown().convert(content)
+			_tags = sorted(filter(lambda x: len(x), map(lambda x: x.strip(), list(set(tag.split("#"))))))
+			_tags = [(x, time.strftime("%Y-%m-%d %H:%M:%S")) for x in _tags]
+
+			p = BriefParser(140)
+			p.feed(_content)
+
+			DB.update(sql4, title, content, p.output(), cover, time.strftime("%Y-%m-%d %H:%M:%S"), id)
+			tid = DB.insertmany(sql2, _tags)
+			article_tags = [(id, x) for x in range(tid - len(_tags) + 1, tid + 1)]
+			DB.insertmany(sql3, article_tags)
+		except Exception, e:
+			print self, e
+		self.redirect("/")
 
 	@tornado.web.authenticated
 	def delete(self, id):
@@ -147,10 +183,20 @@ class ArticleHandler(BaseHandler):
 
 class EditorHandler(BaseHandler):
 	@tornado.web.authenticated
-	def get(self):
-		self.render("editor.html")
+	def get(self, id):
+		sql = "SELECT * FROM Article WHERE id=%s"
+		sql2 = "SELECT tagname FROM Article_Tag AS at, Tag AS t WHERE at.article_id=%s AND at.tag_id=t.id"
+		if id:
+			article = DB.get(sql, id)
+			tags = DB.query(sql2, id)
+			tags = "#".join(map(lambda x: x["tagname"].encode("utf-8"), tags))
+		else:
+			article = {"title": "", "id": "", "content": "", "cover": ""}
+			tags = ""
+		self.render("editor.html", article=article, tags=tags)
 
-	def post(self):
+	@tool.restful
+	def post(self, *args):
 		content = self.get_argument("editor", "")
 		md = markdown2.Markdown()
 
@@ -218,6 +264,35 @@ class CommentHandler(BaseHandler):
 			self.redirect("/article/%s#top" % aid)
 
 
+class LinkEditorHandler(BaseHandler):
+	def get(self):
+		sql = "SELECT content FROM LinkContent"
+		try:
+			content = DB.query(sql)[-1]["content"]
+		except Exception, e:
+			print self, e
+			content = ""
+		self.render("linkeditor.html", content=content)
+
+	def post(self):
+		sql = "INSERT INTO LinkContent(content) VALUES(%s)"
+		sql2 = "INSERT INTO Link(title, address) VALUES(%s, %s)"
+		sql3 = "DELETE FROM Link"
+		content = self.get_argument("editor")
+		_content = markdown2.Markdown().convert(content)
+		try:
+			p = tool.LinkParser()
+			p.feed(_content)
+			links = p.output()
+			DB.insert(sql, content)
+			DB.update(sql3)
+			DB.insertmany(sql2, links)
+		except Exception, e:
+			print self, e
+
+		self.redirect("/")
+
+
 class NotFoundHandler(BaseHandler):
 	def get(self):
 		self.render("404.html")
@@ -228,7 +303,8 @@ class Application(tornado.web.Application):
 		urls = [
 			(r"^/(\d*)$", IndexHandler),
 			(r"^/auth/$", AuthHandler),
-			(r"^/editor/$", EditorHandler),
+			(r"^/editor/(\d*)$", EditorHandler),
+			(r"^/linkeditor/$", LinkEditorHandler),
 			(r"^/article/$", ArticleHandler),
 			(r"^/article/(\d+)$", ArticleHandler),
 			(r"^/tag/(.+)/(\d*)$", TagHandler),

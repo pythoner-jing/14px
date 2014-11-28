@@ -14,13 +14,14 @@
 </div>
 <div id="content" class="panel clear">
 	<p class="text text-orange">发布新文章</p>
-	<form action="/article/" method="post">
-		<input type="text" name="title" placeholder="标题" class="">
-		<input type="text" name="tag" placeholder="标签" class="">
-		<input type="text" name="cover" placeholder="封面" class="">
-		<textarea id="editor" name="editor"></textarea>
+	<form action="/article/{{ article['id'] }}" method="post">
+		<input type="text" name="title" placeholder="标题" value="{{ article['title'] }}">
+		<input type="text" name="tag" placeholder="标签" value="{{ tags }}">
+		<input type="text" name="cover" placeholder="封面" value="{{ article['cover'] }}">
+		<textarea id="editor" name="editor" value="">{{ article["content"] }}</textarea>
 		<input type="submit" value="发布" class="btn btn-sun-flower">
 		<button type="button" id="preview_btn" class="btn btn-emerald">预览</button>
+		{% if len(article["title"]) %}<input name="_method" value="put" type="hidden"/>{% end %}
 	</form>
 </div>
 {% end %}

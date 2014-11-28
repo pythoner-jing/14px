@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block style %}
+<link rel="stylesheet/less" href="/static/style/editor.less">
+{% end %}
+
+{% block script %}
+{% end %}
+
+{% block wrapper %}
+<a name="top"></a>
+<div id="content" class="panel clear">
+	<p class="text text-orange">编辑链接</p>
+	<form action="/linkeditor/" method="post">
+		<textarea id="editor" name="editor">{{ content }}</textarea>
+		<input type="submit" value="生效" class="btn btn-sun-flower">
+	</form>
+</div>
+{% end %}
+
+{% block script_bottom %}
+
+{% end %}

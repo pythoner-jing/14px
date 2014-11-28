@@ -1,10 +1,11 @@
 #!/usr/bin/env python
-#coding:utf-8
+# coding:utf-8
 
 import markdown2
 import time
 
 from HTMLParser import HTMLParser
+from sgmllib import SGMLParser
 import functools
 
 
@@ -30,8 +31,35 @@ class BriefParser(HTMLParser):
 			self.rs.append(data.strip())
 
 	def output(self):
-		tmp = "".join(self.rs)[:self.limit]
-		return tmp if len(tmp) <= self.limit else tmp + "..."
+		tmp = "".join(self.rs)
+		print len(self.rs), self.rs
+		return tmp if len(tmp) <= self.limit else tmp[:self.limit] + "..."
+
+
+class LinkParser(SGMLParser):
+	def __init__(self):
+		self.test_a = 0
+		self.links = []
+		self.address = None
+		self.text = None
+		SGMLParser.__init__(self)
+
+	def reset(self):
+		SGMLParser.reset(self)
+
+	def start_a(self, attrs):
+		for k, v in attrs:
+			if k == "href":
+				self.address = v
+
+	def handle_data(self, data):
+		self.text = data
+
+	def end_a(self):
+		self.links.append((self.text, self.address))
+
+	def output(self):
+		return self.links
 
 
 def cut(data, size):
