@@ -41,3 +41,10 @@ class CommentModule(tornado.web.UIModule):
         except Exception, e:
             print e
         return self.render_string("modules/comment.html", article=article, comment=comment)
+
+
+class LinkModule(tornado.web.UIModule):
+    def render(self):
+        sql = "SELECT * FROM Link"
+        links = DB.query(sql)
+        return self.render_string("modules/link.html", links=links)

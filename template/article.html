@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 
 {% block style %}
-<link rel="stylesheet/less" href="/static/style/article.less">
+<link rel="stylesheet" href="/static/style/article.css">
 {% end %}
 
 {% block script %}
@@ -44,9 +44,9 @@
 <a name="reply"></a>
 <div id="reply" class="panel clear">
     <form action="/article/{{ article.id}}/comment/" method="post">
-        <input type="text" name="guestname" placeholder="昵称(必填)" maxlength="20" value="{{ guestname }}">
-        <input type="text" name="email" placeholder="邮箱(必填)" value="{{ email }}">
-        <input type="text" name="homepage" placeholder="主页(选填)" value="{{ homepage }}">
+        <input type="text" name="guestname" placeholder="昵称(必填)" maxlength="20" value="{{ care_none(guestname) }}">
+        <input type="text" name="email" placeholder="邮箱(必填)" value="{{ care_none(email) }}">
+        <input type="text" name="homepage" placeholder="主页(选填)" value="{{ care_none(homepage) }}">
         <input type="hidden" name="ref">
         <textarea id="replybox" name="content" cols="30" rows="10" maxlength="1000"></textarea>
         <span id="tip"></span><span id="cancel">撤销</span>

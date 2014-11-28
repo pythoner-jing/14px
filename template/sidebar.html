@@ -18,9 +18,7 @@
 	<div id="link" class="panel">
 		<p>链接</p>
 		<ul>
-			{% for link in links %}
-			<li><a href="{{ link.address }}" class="link link-peter-river" target="_blank">{{ link.title }}</a></li>
-			{% end %}
+			{{ modules.Link() }}
 		</ul>
 	</div>
 	{% if not current_user %}

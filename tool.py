@@ -106,3 +106,7 @@ def paging(p, count, size):
 	)
 
 	return paging, offset
+
+
+def care_none(x):
+	return x if x else ""
