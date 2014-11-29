@@ -102,7 +102,7 @@ class ArticleHandler(BaseHandler):
         sql2 = "SELECT tagname FROM Article_Tag AS a,\
 		Tag AS t WHERE a.article_id=%s AND a.tag_id=t.id"
         sql3 = "UPDATE Article SET click=click+1 WHERE id=%s"
-        sql4 = "SELECT * FROM Comment WHERE article_id=%s"
+        sql4 = "SELECT * FROM Comment WHERE article_id=%s ORDER BY id"
 
         try:
             DB.update(sql3, id)
