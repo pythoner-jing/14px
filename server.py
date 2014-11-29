@@ -12,8 +12,8 @@ from tornado.options import define, options
 from tool import BriefParser, cut
 
 
-define('username', default='14px')
-define('password', default='britten')
+define('username', default='')
+define('password', default='')
 define('plimit', default=10)
 define('toplimit', default=10)
 define('climit', default=10)
