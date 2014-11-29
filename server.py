@@ -176,10 +176,10 @@ class EditorHandler(BaseHandler):
         else:
             article = {"title": "", "id": "", "content": "", "cover": ""}
             tags = ""
-            data = dict(
-                article=article,
-                tags=tags,
-            )
+        data = dict(
+            article=article,
+            tags=tags,
+        )
         self.render("editor.html", **data)
 
     @tool.restful
